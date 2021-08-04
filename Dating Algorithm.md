@@ -1320,7 +1320,7 @@ for (int i = 1; i < n; i++) {
 }
 ```
 
-举个我们写过的例子 [最长递增子序列](http://mp.weixin.qq.com/s?__biz=MzAxODQxMDM0Mw==&mid=2247484498&idx=1&sn=df58ef249c457dd50ea632f7c2e6e761&chksm=9bd7fa5aaca0734c29bcf7979146359f63f521e3060c2acbf57a4992c887aeebe2a9e4bd8a89&scene=21#wechat_redirect)，在这个思路中 dp 数组的定义是：
+举个我们写过的例子[300. 最长递增子序列](https://leetcode-cn.com/problems/longest-increasing-subsequence/)，在这个思路中 dp 数组的定义是：
 
 **在子数组`array[0..i]`中，以\**`array[i]`\**结尾的目标子序列（最长递增子序列）的长度是`dp[i]`**。
 
@@ -1847,7 +1847,7 @@ public:
 2. 设T2 = dp[K] [N-m]，在K固定的情况下，值随m的增加而单调递减
    因为我们要找到一个m，使得⁡min (1≤m≤N) (max⁡(dp[K−1] [m−1], dp[K] [N−m])+1)
 
-![image.png](C:\Users\admin\Desktop\egg\egg.assets\1614238285-zfASYP-image.png)
+![image-20210804164356467](https://gitee.com/ahrunio/pic-go-image-hosting-service/raw/master/img/image-20210804164356467.png)
 
 
 所以一定存在一个交点，满足我们的条件，由于必须取离散的值，因此
@@ -1988,7 +1988,7 @@ public:
 
 **`dp[i][j] = x`表示，戳破气球`i`和气球`j`之间（开区间，不包括`i`和`j`）的所有气球，可以获得的最高分数为`x`**。
 
-题目要求的结果就是`dp[0][n+1]`的值，而 base case 就是`dp[i][j] = 0`，其中`0 <= i <= n+1, j <= i+1`，因为这种情况下，开区间`(i, j)`中间根本**没有气球**可以戳。
+题目要求的结果就是`dp[0][n+1]`的值，而 base case 就是`dp[i][i] = 0`，其中`0 <= i <= n+1, j <= i+1`，因为这种情况下，开区间`(i, j)`中间根本**没有气球**可以戳。
 
 「正向思考」，就只能写出前文的回溯算法；**「反向思考」，想一想气球`i`和气球`j`之间最后一个被戳破的气球可能是哪一个**？气球`i`和气球`j`之间的所有气球都可能是最后被戳破的那一个，不防假设为`k`。回顾动态规划的套路，这里其实已经找到了「状态」和「选择」：`i`和`j`就是两个「状态」，最后戳破的那个气球`k`就是「选择」。
 
@@ -2214,6 +2214,8 @@ int maxA(int n) {
 
 
 ### KMP **背！**
+
+[28. 实现 strStr()](https://leetcode-cn.com/problems/implement-strstr/)
 
 **背！** 都是 **int j = 0 -> 处理next -> while -> if -> 。。。的结构** 
 
