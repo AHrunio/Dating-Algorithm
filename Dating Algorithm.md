@@ -5293,42 +5293,37 @@ public:
 ```cc
 class Solution {
 public:
-    bool isval(vector<vector<char>>& board,int r ,int c,char ch){
-        for(int i =0;i<9;i++){
-            if(board[r][i]==ch)return false;// 行
-            else if(board[i][c]==ch)return false; // 列
-            else if(board[(r/3)*3+i/3][(c/3)*3+i%3]==ch)return false;//  3 x 3 方框!!!
+    bool isvalue(vector<vector<char>>&b,int r,int c,char v){
+        for(int i=0;i<9;i++){
+            if(b[r][i]==v)return false;// 行
+            else if(b[i][c]==v)return false;// 列
+            else if(b[(r/3)*3+i/3][(c/3)*3+i%3]==v)return false;//  3 x 3 方框!!!
         }
         return true;
     }
-    
-    bool backtrace(vector<vector<char>>& board,int r ,int c){
+    void solveSudoku(vector<vector<char>>& board) {
+        dfs(board, 0, 0);
+    }
+    bool dfs(vector<vector<char>>&b,int r,int c){
         if(r==9){
             return true;// 找到一个可行解，触发 base case
         }
-        if(c==9)return backtrace(board,r+1,0);// 穷举到最后一列的话就换到下一行重新开始。
-        for(int i = r;i<9;i++){// 就是对每个位置进行穷举
-            for(int j =c;j<9;j++){
-                if(board[i][j]!='.'){ // 如果有预设数字，不用我们穷举
-                    return backtrace(board,r,c+1);
-                }
-                for(char ch = '1';ch<='9';ch++){
-                    if(!isval(board,r,c,ch)){// 如果遇到不合法的数字，就跳过
-                        continue;
-                    }
-                    board[i][j]=ch;
-                    if(backtrace(board, r, c+1)) // 如果找到一个可行解，立即结束
-                        return true;//只能在这里判断可行解
-                    board[i][j]='.';
-                }
-                return false;// 穷举完 1~9，依然没有找到可行解，此路不通
-            }
+        if(c==9){
+            return dfs(b,r+1,0);// 穷举到最后一列的话就换到下一行重新开始。
         }
-        return false;
-    } 
-    
-    void solveSudoku(vector<vector<char>>& board) {
-        backtrace(board, 0, 0);
+        if(b[r][c]!='.'){
+            return dfs(b, r, c+1);// 如果有预设数字，不用我们穷举
+        }
+        for(char ch='1';ch<='9';ch++){
+            if(!isvalue(b,r,c,ch)){// 如果遇到不合法的数字，就跳过
+                continue;
+            }
+            b[r][c]=ch;
+            if(dfs(b,r,c+1))// 如果找到一个可行解，立即结束
+                return true;//只能在这里判断可行解
+            b[r][c]='.';
+        }
+        return false;// 穷举完 1~9，依然没有找到可行解，此路不通
     }
 };
 ```
