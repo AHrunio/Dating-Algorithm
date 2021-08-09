@@ -49,6 +49,48 @@ cin.getline(str[2], 11);     //默认结束符 enter
 
 ```
 
+## 控制输出精度
+
+```cc
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+void main()
+{
+    double pi = 3.14159265;
+    cout << pi << endl;                     // 默认以6精度，所以输出为 3.14159
+    cout << setprecision(4) << pi << endl;  // 改成4精度，所以输出为3.142
+    cout << setprecision(8) << pi << endl;  // 改成8精度，所以输出为3.1415927
+    cout << fixed << setprecision(4) << pi << endl; // 加了fixed意味着是固定点方式显示，所以这里的精度指的是小数位，输出为3.1416
+    cout << pi << endl;                     // fixed和setprecision的作用还在，依然显示3.1416
+    cout.unsetf(ios::fixed);                // 去掉了fixed，所以精度恢复成整个数值的有效位数，显示为3.142
+    cout << pi << endl;
+    cout.precision(6);                      // 恢复成原来的样子，输出为3.14159
+    cout << pi << endl;
+}
+```
+
+```cc
+double n = 0.001010;
+cout.precision(4);
+cout << n << endl;
+```
+
+这个的输出结果就是0.00101。从第一个1开始为第一个有效位，连续输出4个有效位，最后一位的0被省略。这并没有达到我们要设置小数点后位数的要求，所以在查阅了资料后发现结合std::fixed使用可以控制小数点后的位数，使用方法如下：
+
+```cc
+double n = 0.001010;
+cout.precision(4);
+cout << fixed << n << endl;
+```
+
+这个的输出结果就是0.0010。
+
+需要注意的是 cout.precision(4); 后cout的精度一直都是4个有效位，若设置了fixed，就一直控制小数点后的位数。目前还没有消除precision的方法，只能重新设置成新的有效位，但是针对fixed可是通过cout.unsetf( ios::fixed );来消除。
+
+# 常用排序
+
 ```c++
 void mergeSort(int l ,int r,vector<int>& v ,vector<int>& temp){//归并排序
         if (l >= r)return;
