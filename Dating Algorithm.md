@@ -6854,3 +6854,23 @@ public:
 };
 ```
 
+### 二分法求sqrt（）
+
+利用二分法求一个数的平方根,精度要求 e < 10^-6
+
+```cc
+#include <math.h> 
+double sqrt(double x )
+{
+ double low= 0;double up=x;
+ double mid = low + (up - low)/ 2;
+ while (fabs(mid * mid - x) >=1e-6)
+ {
+  mid = low + (up - low) / 2;
+  if (mid * mid > x) up = mid;
+  else if (mid * mid < x) low = mid;
+ }
+ return mid;
+}
+```
+
