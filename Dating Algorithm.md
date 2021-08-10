@@ -6745,3 +6745,112 @@ public:
 };
 ```
 
+### 接雨水
+
+[42. 接雨水](https://leetcode-cn.com/problems/trapping-rain-water/)
+
+```cc
+//双指针
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int n=height.size();
+        int l=0 ,r=n-1;
+        int lmax=0,rmax=0;
+        int res=0;
+        while(l<r){
+            if(height[l]<=height[r]){//左边比右边小 结果增量取决于 左最大-左当前
+                if(height[l]>lmax){
+                    lmax=height[l];
+                }
+                res+=lmax-height[l];
+                l++;
+            }else{//右边比左边小 结果增量取决于 右最大-右当前
+                if(height[r]>rmax){
+                    rmax=height[r];
+                }
+                res+=rmax-height[r];
+                r--;
+            }
+        }
+        return res;
+    }
+};
+
+//暴力法 + 备忘录优化
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        if(height.empty())return 0;
+        int n=height.size();
+        vector<int> lmax(n),rmax(n);//记得初始化 (n)
+        
+        lmax[0]=height[0],rmax[n-1]=height[n-1];
+        for(int i=1;i<n;i++){
+            lmax[i]=max(lmax[i-1],height[i]);
+        }
+        for(int i=n-2;i>=0;i--){
+            rmax[i]=max(rmax[i+1],height[i]);
+        }
+        int res=0;
+        for(int i=1;i<n-1;i++){
+            res+=min(lmax[i],rmax[i])-height[i];
+        }
+        return res;
+    }
+};
+```
+
+
+
+### 括号匹配 带*
+
+[678. 有效的括号字符串](https://leetcode-cn.com/problems/valid-parenthesis-string/)
+
+```cc
+//贪心
+bool checkValidString(string s) {
+        int l=0,r=0;
+        for(auto c:s){
+            if(c=='('){
+                l++;r++;
+            }else if(c==')'){
+                if(l>0)l--;
+                if(r--==0)return false;
+            }else{
+                if(l>0)l--;
+                r++;
+            }
+        }
+        return l==0;
+}
+
+//双stack
+class Solution {
+public:
+    stack<int> s1,s2;
+    bool checkValidString(string s) {
+        for(int i=0;i<s.size();i++){
+            char c=s[i];
+            if(c=='(')s1.push(i);
+            else if(c=='*')s2.push(i);//存的是idx
+            else if(c==')'){
+                if(!s1.empty()){
+                    s1.pop();
+                    continue;
+                }else if(!s2.empty()){
+                    s2.pop();
+                }else return false;
+            }
+        }
+        while(!s1.empty()&&!s2.empty()){
+            if(s1.top()>s2.top())return false;
+            s1.pop();
+            s2.pop();
+        }
+        if(!s1.empty())return false;
+        return true;
+    }
+};
+```
+
