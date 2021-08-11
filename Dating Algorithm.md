@@ -6862,15 +6862,486 @@ public:
 #include <math.h> 
 double sqrt(double x )
 {
- double low= 0;double up=x;
- double mid = low + (up - low)/ 2;
- while (fabs(mid * mid - x) >=1e-6)
- {
-  mid = low + (up - low) / 2;
-  if (mid * mid > x) up = mid;
-  else if (mid * mid < x) low = mid;
- }
- return mid;
+     double l = 0, r = x;
+        while (1) {
+            double mid = l + (r - l) / 2;
+            if (fabs(x /mid - mid) < 1e-6)	return mid;
+            else if (x / mid > mid)	left = mid + 1;
+            else right = mid - 1;
+        }
 }
+```
+
+### 二叉树的右视图
+
+[199. 二叉树的右视图](https://leetcode-cn.com/problems/binary-tree-right-side-view/)
+
+```cc
+//bfs
+vector<int> rightSideView(TreeNode* root) {
+        if(!root)return {};
+        queue<TreeNode*> q;
+        vector<int> res;
+        q.push(root);
+        
+        while(!q.empty()){
+            int sz=q.size();
+            for(int i=0;i<sz;i++){
+                auto f=q.front();
+                q.pop();
+                if(i==sz-1)res.push_back(f->val);
+                if(f->left)q.push(f->left);
+                if(f->right)q.push(f->right);
+            }
+        }
+        return res;
+    }
+```
+
+### 48. 旋转图像
+
+[48. 旋转图像](https://leetcode-cn.com/problems/rotate-image/)
+
+```cc
+void rotate(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        // 水平翻转
+        for (int i = 0; i < n / 2; ++i) {
+            for (int j = 0; j < n; ++j) {
+                swap(matrix[i][j], matrix[n - i - 1][j]);
+            }
+        }
+        // 主对角线翻转
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < i; ++j) {
+                swap(matrix[i][j], matrix[j][i]);
+            }
+        }
+    }
+```
+
+### 岛屿数量
+
+[200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/)
+
+```cc
+//dfs
+void dfs(vector<vector<char>>& g,int r,int c){
+        int nr = g.size();
+        int nc = g[0].size();
+        if(r<0||r>=nr||c<0||c>=nc||g[r][c] == '0')return;
+        g[r][c] = '0';
+        dfs(g,r+1,c);
+        dfs(g,r,c+1);
+        dfs(g,r-1,c);
+        dfs(g,r,c-1);
+    }
+    int numIslands(vector<vector<char>>& grid) {
+        int nr = grid.size(),nc = grid[0].size();
+        if (!nr) return 0;
+        int res = 0;
+        for (int r = 0; r < nr; ++r) {
+            for (int c = 0; c < nc; ++c) {
+                if (grid[r][c] == '1') {
+                    ++res;
+                    dfs(grid, r, c);
+                }
+            }
+        }
+        return res;
+    }
+//bfs
+int numIslands(vector<vector<char>>& grid) {
+        int nr = grid.size();
+        if (!nr) return 0;
+        int nc = grid[0].size();
+        int res = 0;
+        for (int r = 0; r < nr; ++r) {
+            for (int c = 0; c < nc; ++c) {
+                if (grid[r][c] == '1') {
+                    ++res;
+                    grid[r][c] = '0';
+                    queue<pair<int, int>> neighbors;
+                    neighbors.push({r, c});
+                    while (!neighbors.empty()) {
+                        auto rc = neighbors.front();
+                        neighbors.pop();
+                        int row = rc.first, col = rc.second;
+                        if (row - 1 >= 0 && grid[row-1][col] == '1') {
+                            neighbors.push({row-1, col});
+                            grid[row-1][col] = '0';
+                        }
+                        if (row + 1 < nr && grid[row+1][col] == '1') {
+                            neighbors.push({row+1, col});
+                            grid[row+1][col] = '0';
+                        }
+                        if (col - 1 >= 0 && grid[row][col-1] == '1') {
+                            neighbors.push({row, col-1});
+                            grid[row][col-1] = '0';
+                        }
+                        if (col + 1 < nc && grid[row][col+1] == '1') {
+                            neighbors.push({row, col+1});
+                            grid[row][col+1] = '0';
+                        }
+                    }
+                }
+            }
+        }
+
+        return res;
+    }
+
+//并查集
+
+class UnionFind {
+public:
+    UnionFind(vector<vector<char>>& grid) {
+        count = 0;
+        int m = grid.size();
+        int n = grid[0].size();
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (grid[i][j] == '1') {
+                    parent.push_back(i * n + j);
+                    ++count;
+                }
+                else {
+                    parent.push_back(-1);
+                }
+                rank.push_back(0);
+            }
+        }
+    }
+
+    int find(int i) {
+        if (parent[i] != i) {
+            parent[i] = find(parent[i]);
+        }
+        return parent[i];
+    }
+
+    void unite(int x, int y) {
+        int rootx = find(x);
+        int rooty = find(y);
+        if (rootx != rooty) {
+            if (rank[rootx] < rank[rooty]) {
+                swap(rootx, rooty);
+            }
+            parent[rooty] = rootx;
+            if (rank[rootx] == rank[rooty]) rank[rootx] += 1;
+            --count;
+        }
+    }
+
+    int getCount() const {
+        return count;
+    }
+
+private:
+    vector<int> parent;
+    vector<int> rank;
+    int count;
+};
+
+class Solution {
+public:
+    int numIslands(vector<vector<char>>& grid) {
+        int nr = grid.size();
+        if (!nr) return 0;
+        int nc = grid[0].size();
+        UnionFind uf(grid);
+        int num_islands = 0;
+        for (int r = 0; r < nr; ++r) {
+            for (int c = 0; c < nc; ++c) {
+                if (grid[r][c] == '1') {
+                    grid[r][c] = '0';
+                    if (r - 1 >= 0 && grid[r-1][c] == '1') uf.unite(r * nc + c, (r-1) * nc + c);
+                    if (r + 1 < nr && grid[r+1][c] == '1') uf.unite(r * nc + c, (r+1) * nc + c);
+                    if (c - 1 >= 0 && grid[r][c-1] == '1') uf.unite(r * nc + c, r * nc + c - 1);
+                    if (c + 1 < nc && grid[r][c+1] == '1') uf.unite(r * nc + c, r * nc + c + 1);
+                }
+            }
+        }
+        return uf.getCount();
+    }
+};
+```
+
+### 二叉树的锯齿形层序遍历
+
+[103. 二叉树的锯齿形层序遍历](https://leetcode-cn.com/problems/binary-tree-zigzag-level-order-traversal/)
+
+```cc
+vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
+        if(!root)return {};
+        queue<TreeNode*> dq;
+        dq.push(root);
+        vector<vector<int>> res;
+        int n=1;
+        while(!dq.empty()){
+            int sz=dq.size();
+            deque<int> v;
+            for(int i=0;i<sz;i++){
+                auto f=dq.front();
+                dq.pop();
+                if(n%2==1){ 
+                    v.push_back(f->val);
+                }else if(n%2==0){
+                    v.push_front(f->val);
+                }
+                if(f->left)dq.push(f->left);
+                if(f->right)dq.push(f->right);   
+            }
+            res.emplace_back(vector<int>{v.begin(), v.end()});
+            n++;
+        }
+        return res;
+```
+
+### 搜索旋转排序数组
+
+[33. 搜索旋转排序数组](https://leetcode-cn.com/problems/search-in-rotated-sorted-array/)
+
+```cc
+int search(vector<int>& nums, int target) {
+        int n = nums.size();
+        int l = 0, r = n - 1;
+        while (l <= r) {
+            int mid = (l + r) / 2;
+            if (nums[mid] == target) return mid;
+            if (nums[0] <= nums[mid]) {//mid左有序
+                if (nums[0] <= target && target < nums[mid]) r = mid - 1;
+                else l = mid + 1;
+            } else {
+                if (nums[mid] < target && target <= nums[n - 1]) l = mid + 1;
+                else r = mid - 1;
+            }
+        }
+        return -1;
+    }
+```
+
+### 重排链表
+
+[143. 重排链表](https://leetcode-cn.com/problems/reorder-list/)
+
+```cc
+ void reorderList(ListNode* head) {
+        if (head == nullptr) {
+            return;
+        }
+        ListNode* mid = middleNode(head);
+        ListNode* l1 = head;
+        ListNode* l2 = mid->next;
+        mid->next = nullptr;
+        l2 = reverseList(l2);
+        mergeList(l1, l2);
+    }
+
+    ListNode* middleNode(ListNode* head) {//找到原链表的中点
+        ListNode* slow = head;
+        ListNode* fast = head;
+        while (fast->next != nullptr && fast->next->next != nullptr) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        return slow;
+    }
+
+    ListNode* reverseList(ListNode* head) {//将原链表的右半端反转
+        ListNode* prev = nullptr;
+        ListNode* curr = head;
+        while (curr != nullptr) {
+            ListNode* nextTemp = curr->next;
+            curr->next = prev;
+            prev = curr;
+            curr = nextTemp;
+        }
+        return prev;
+    }
+
+    void mergeList(ListNode* l1, ListNode* l2) {//将原链表的两端合并
+        ListNode* l1next;
+        ListNode* l2next;
+        while (l1 != nullptr && l2 != nullptr) {
+            l1next = l1->next;
+            l2next = l2->next;
+            l1->next = l2;
+            l1 = l1next;
+            l2->next = l1;
+            l2 = l2next;
+        }
+    }
+```
+
+### 下一个排列
+
+[31. 下一个排列](https://leetcode-cn.com/problems/next-permutation/)
+
+![img](https://pic.leetcode-cn.com/1622189822-LnnwFv-file_1622189822542)
+
+```cc
+void nextPermutation(vector<int>& nums) {
+        int cur=nums.size()-2;
+        while(cur>=0&&nums[cur]>=nums[cur+1]) cur--;
+        if(cur<0) sort(nums.begin(),nums.end());
+        else {
+            int pos=nums.size()-1;
+            while(nums[pos]<=nums[cur]) pos--;
+            swap(nums[pos],nums[cur]);
+            reverse(nums.begin()+cur+1, nums.end());
+        }
+    }
+```
+
+### [删除排序链表中的重复元素 II](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list-ii/)
+
+```cc
+ ListNode* deleteDuplicates(ListNode* head) {
+        if (!head || !head->next) return head;
+        if (head->val != head->next->val) {
+            head->next = deleteDuplicates(head->next);
+        } else {
+            ListNode* move = head->next;
+            while (move && head->val == move->val) {
+                move = move->next;
+            }
+            return deleteDuplicates(move);
+        }
+        return head;
+    }
+```
+
+### [ 二叉树的完全性检验](https://leetcode-cn.com/problems/check-completeness-of-a-binary-tree/)
+
+```cc
+bool isCompleteTree(TreeNode* root) {
+        queue<TreeNode*> q;
+        q.push(root);
+        bool reachnull=false;
+        while(!q.empty()){
+            int sz=q.size();
+            for(int i=0;i<sz;i++){
+                auto f=q.front();
+                q.pop();
+                if(!f){
+                    reachnull=1;
+                    continue;
+                }else{
+                    if(reachnull)return false;//null结点后又出现空结点
+                    q.push(f->left);
+                    q.push(f->right);
+                }
+            }
+        }
+         return true;
+    }
+```
+
+### [合并K个升序链表](https://leetcode-cn.com/problems/merge-k-sorted-lists/)
+
+```cc
+ListNode* mergeKLists(vector<ListNode*>& lists) {   
+        struct cmp{
+            bool operator()(ListNode* a,ListNode* b){
+                return a->val>b->val;
+            }
+        };
+        priority_queue<ListNode*, vector<ListNode*>, cmp> p;
+        for(auto l:lists){
+            if(l)p.push(l);
+        }
+        ListNode* d=new ListNode(-1);
+        auto res=d;
+        while(!p.empty()){
+            auto top=p.top();
+            p.pop();
+            d->next=top;
+            d=d->next;
+            if(top->next)p.push(top->next);
+        }
+        return res->next;
+    }
+```
+
+### [求根节点到叶节点数字之和](https://leetcode-cn.com/problems/sum-root-to-leaf-numbers/)
+
+```cc
+int sumNumbers(TreeNode* root) {
+        return sum(root,0);
+    }
+    int sum(TreeNode* root,int n){//前序+回溯
+        if(!root)return 0;
+        int t=10*n+root->val;
+        if (!root->left&& !root->right)
+            return t;
+        int l=sum(root->left,t);
+        int r=sum(root->right,t);
+        return l+r;
+    }
+```
+
+### [用 Rand7() 实现 Rand10()](https://leetcode-cn.com/problems/implement-rand10-using-rand7/)
+
+`(rand_X() - 1) × Y + rand_Y() ==> 可以等概率的生成[1, X * Y]范围的随机数,即实现了 rand_XY()`
+
+```cc
+int rand10() {
+        int n=(rand7()-1)*7+rand7();
+        while(n>40){
+            n=(rand7()-1)*7+rand7();
+        }
+        return (n-1)%10+1;
+    }
+```
+
+### [缺失的第一个正数](https://leetcode-cn.com/problems/first-missing-positive/)
+
+```cc
+int firstMissingPositive(vector<int>& nums) {
+        int n=nums.size();
+        bool have1=0;        
+        for(auto& a:nums){
+            if(a==1)have1=1;
+            else if(a<1)a=n+1;
+        }
+        if(!have1)return 1;
+        for(int i=0;i<nums.size();i++){
+            int num=abs(nums[i]);
+            if(num<=n)nums[num-1]=-abs(nums[num-1]);
+        }
+        for(int i=0;i<nums.size();i++){
+            if(nums[i]>0)return i+1;
+        }
+        return n+1;
+    }
+```
+
+### [ 排序链表](https://leetcode-cn.com/problems/sort-list/)
+
+```cc
+ListNode* sortList(ListNode* head) {
+        if(!head || !head->next) return head;
+        ListNode* pre = head, *slow = head, *fast = head;
+        while(fast && fast->next) {
+            pre = slow;
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        pre->next = nullptr;
+        return merge(sortList(head), sortList(slow));
+    }
+    ListNode* merge(ListNode* h1, ListNode* h2) {
+        if(!h1) return h2;
+        if(!h2) return h1;
+        if(h1->val < h2->val) {
+            h1->next = merge(h1->next, h2);
+            return h1;
+        }
+        else {
+            h2->next = merge(h1, h2->next);
+            return h2;
+        }
+    }
 ```
 
