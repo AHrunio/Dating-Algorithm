@@ -5925,7 +5925,7 @@ public:
 
 
 
-### 分治算法
+### 分治算法 为运算表达式设计优先级
 
 [241. 为运算表达式设计优先级](https://leetcode-cn.com/problems/different-ways-to-add-parentheses/)
 
@@ -8616,3 +8616,4 @@ int reverse(int x) {
     }
 ```
 
+ 
