@@ -8617,3 +8617,72 @@ int reverse(int x) {
 ```
 
  
+
+### 讨厌的1
+
+给一个数组，判断里面的数是不是讨厌的1数
+
+讨厌的1数：由11，111，1111.....乘一个非负整数相加可得；
+
+如 122= 11 * 1+111 * 1
+
+```c++
+void CountNumbers() {
+    int n;
+    cin >> n;
+    vector<long long>ones = { 11, 111 };
+    vector<long long >nums(n);
+    int cnt = 0;
+    for (int i = 0; i < n; ++i) {
+        cin >> nums[i];
+        if (nums[i] % 11 == 0 || nums[i] % 111 == 0) {
+            cnt++;
+            continue;
+        }
+        long long b = nums[i] % 11;
+        int mul = b;
+        while (true) {
+            if (nums[i] - 111 * mul > 0) {
+                if ((nums[i] - 111 * mul) % 11 == 0) {
+                    cnt++;
+                    break;
+                }
+                mul += 11;
+            }
+            else
+                break;
+        }
+    }
+    cout << cnt << endl;
+}
+```
+
+### 贪心算法 购物心情
+
+给一串 1 -4 1 2 -1 -2，这些数字代表心情，心情**小于0**强制退出，求最大的购物次数（上面案例是 1 1 2 -1 -2，所以是5）
+
+```c++
+void maxCountGoods() {
+    int n;
+    cin >> n;
+    vector<long long>happy_value(n);
+    for (int i = 0; i < n; ++i) {
+        cin >> happy_value[i];
+    }
+    priority_queue<long long, vector<long long>, greater<long long> >qu;
+    long long now = 0, cnt = 0;
+    for (int i = 0; i < n; ++i) {
+        now += happy_value[i];
+        cnt++;
+        if (happy_value[i] < 0)  qu.push(happy_value[i]);
+
+        while (now < 0 && !qu.empty()) {
+            now -= qu.top();
+            qu.pop();
+            cnt--;
+        }
+    }
+    cout << cnt << endl;
+}
+```
+
