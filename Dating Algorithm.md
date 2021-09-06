@@ -8627,6 +8627,7 @@ int reverse(int x) {
 如 122= 11 * 1+111 * 1
 
 ```c++
+//best 同余定理  数学法：
 void CountNumbers() {
     int n;
     cin >> n;
@@ -8654,6 +8655,32 @@ void CountNumbers() {
         }
     }
     cout << cnt << endl;
+}
+
+// 回溯+剪枝 超时； 
+vector<long> longn = { 11,111,1111,11111,111111,1111111,11111111,111111111 };
+int res = 0;
+bool sss(long n) {
+    if (n == 0) {
+        res++;
+        return true;
+    }
+    
+    for (int i = 0; i < 8; i++) {
+        if (n >= longn[i]) {
+            auto b=sss(n - longn[i]);
+            if (b)return true;
+        }
+    }
+    return false;
+}
+
+int main() {
+    sss(122);
+    cout << res;
+    
+    return 0;
+
 }
 ```
 
