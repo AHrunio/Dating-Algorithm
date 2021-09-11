@@ -8696,7 +8696,7 @@ void maxCountGoods() {
     for (int i = 0; i < n; ++i) {
         cin >> happy_value[i];
     }
-    priority_queue<long long, vector<long long>, greater<long long> >qu;
+    priority_queue<long long, vector<long long>, greater<long long> >qu;//小顶
     long long now = 0, cnt = 0;
     for (int i = 0; i < n; ++i) {
         now += happy_value[i];
@@ -8711,5 +8711,231 @@ void maxCountGoods() {
     }
     cout << cnt << endl;
 }
+```
+
+### 另一棵树的子树
+
+[另一棵树的子树](https://leetcode-cn.com/problems/subtree-of-another-tree/)
+
+```c++
+bool check(TreeNode*root,TreeNode*subRoot) //判断是否是一个相同的树
+    {
+        //递归结束条件一：当其左右子树为空 代表已经匹配上
+        if(root ==nullptr&&subRoot == nullptr)return true;
+        //递归结束条件二：倘若有一个子树不为空 代表未匹配上
+        if(!root||!subRoot)return false;
+        //递归结束条件三 若节点值不同 代表未匹配上
+        if(root->val != subRoot->val) return false;  
+        //若为相同一个树 则两棵树的左右子树是相同的 同步移动两棵树的指针
+    return check(root->left,subRoot->left)&&check(root->right,subRoot->right);
+    }
+    bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+        //若subRoot为空树 怎么比较都是true
+        if(subRoot == nullptr)return true;
+        //若root为空树，怎么比较都是false
+        if(root == nullptr)return false;
+        //符合subRoot是root子树的三个条件：两棵树完全相同；SubRoot为root的左子树，SubRoot为root的右子树
+        return check(root,subRoot)||isSubtree(root->left,subRoot)||isSubtree(root->right,subRoot);
+    }
+```
+
+### 分割数组的最大值
+
+[410. 分割数组的最大值](https://leetcode-cn.com/problems/split-array-largest-sum/)
+
+解题思路：
+由题意可知：子数组的最大值是有范围的，即在区间 [max(nums) , sum(nums) ]  之中。
+令 l=max(nums)，h=sum(nums)，mid=(l+h)/2，计算数组和最大值不大于mid对应的子数组个数 cnt(这个是关键！)
+如果 cnt>m，说明划分的子数组多了，即我们找到的 mid 偏小，故 l=mid+1l=mid+1；
+否则，说明划分的子数组少了，即 mid 偏大(或者正好就是目标值)，故 h=midh=mid。
+
+```c++
+int splitArray(vector<int>& nums, int m) {
+        long l = nums[0], h = 0;//int类型在这里不合适，因为h可能会超过int类型能表示的最大值
+        for (auto i : nums)
+        {
+            h += i;
+            l = l > i ? l : i;
+        }
+        while (l<h)
+        {
+            long mid = (l + h) / 2;
+            long temp = 0;
+            int cnt = 1;//初始值必须为1
+            for(auto i:nums)
+            {
+                temp += i;
+                if(temp>mid)
+                {
+                    temp = i;
+                    ++cnt;
+                }
+            }
+            if(cnt>m)
+                l = mid + 1;
+            else
+                h = mid;
+        }
+        return l;
+    }
+```
+
+### 两个数组的交集
+
+[349. 两个数组的交集](https://leetcode-cn.com/problems/intersection-of-two-arrays/)
+
+```c++
+ vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
+        unordered_map<int,int> sett;
+        vector<int> res;
+        for(auto n1:nums1){
+            if(sett.count(n1)==0)
+                sett[n1]=1;
+        }
+        for(auto n2:nums2){
+            if(sett.count(n2)==1){
+                sett[n2]=2;
+            }
+        }
+        for(auto m:sett){
+            if(m.second==2){
+                res.push_back(m.first);
+            }
+        }
+        return res;
+    }
+```
+
+百度：
+
+```
+#include<iostream>
+#include<vector>
+#include<string>
+using namespace std;
+
+int main() {
+    int N, Q;
+    cin >> N;
+    cin >> Q;
+    vector<int> res(Q);
+    vector<string> strrr(Q);
+    string strr;
+    for (int i = 0; i < Q; i++) {
+        cin >> strr;
+        strrr[i] = strr;
+        strr = "";
+    }
+    for (int i = 0; i < Q; i++) {
+        string str = strrr[i];
+        //
+        char tail = str[0];
+        char head = str[0];
+        int count = 0;
+        int p = 1;
+        while (p < N) {
+            if (str[p] >= tail) {
+                tail = str[p];
+            }
+            else {
+                if (str[p] <= head) {
+                    head = str[p];
+                    while (p + 1 < N && str[p + 1] <= head) {
+                        head = str[p + 1];
+                        p++;
+                    }
+                    //count = count + 2;
+                }
+                else {
+                    while (p + 1 < N && str[p + 1] == str[p]) {
+                        p++;
+                    }
+                    count = count + 3;
+                }
+            }
+            p++;
+        }
+        res[i] = count;
+    }
+    for (auto ii : res) {
+        cout << ii << endl;
+    }
+    return 0;
+}
+
+/*
+ 
+ using namespace std;
+int gcd(int a,int b){
+    if(b==0){
+        return a;
+    }
+    return gcd(b, a%b);
+}
+
+int main(){
+    int T;
+    cin>> T;
+    vector<int> res(T);
+    for(int i=0;i<T;i++){
+        int N;
+        cin>>N;
+        int count=0;
+        for(int j=1;j<=N;j++){
+            if(j*j>N){
+                break;
+            }
+            if(N%j==0){
+                int t=N/j;
+                if(gcd(t,j)==1){
+                    count++;
+                }
+            }
+        }
+        res[i]=count;
+    }
+    for(int i=0;i<T;i++){
+        cout<<res[i]<<endl;
+    }
+    return 0;
+}
+ */
+/*
+
+int main() {
+    int N, K;
+    cin >> N;
+    cin >> K;
+    vector<vector<int>> vec(N, vector<int>(N, 0));
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            cin >> vec[i][j];
+        }
+    }
+    vector<string>res;
+    for (int i = 0; i < N; i++) {
+        string sss;
+        for (int j = 0; j < N; j++) {
+            for (int l = 0; l < K; l++) {
+
+                sss.append(to_string(vec[i][j])).append(" ");
+                //cn++;
+            }
+        }
+        sss.pop_back();
+        res.push_back(sss);
+        sss = "";
+        
+    }
+    for (auto ssss : res) {
+        for (int i = 0; i < K; i++) {
+            cout << ssss << endl;
+        }
+    }
+
+    getchar();
+    return 0;
+}
+*/
 ```
 
