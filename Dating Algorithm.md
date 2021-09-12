@@ -8806,6 +8806,107 @@ int splitArray(vector<int>& nums, int m) {
     }
 ```
 
+### 括号修改为合法
+
+不考虑括号类型括号合法；[、{可以互相转换，]、}可以互相转换
+
+判断修改为合法括号需要的次数
+
+```c++
+int count(string s) {
+	int res = 0;
+	stack<char> sta;
+	for (int i = 0; i < s.size(); i++) {
+		if (!sta.empty()) {
+			if ((s[i] == '}' && sta.top() == '{') || (s[i] == ']' && sta.top() == '[')) {
+				sta.pop();
+				continue;
+			}
+			else if ((s[i] == '}' && sta.top() == '[') || (s[i] == ']' && sta.top() == '{')) {
+				sta.pop();
+				res += 1;
+				continue;
+			}
+		}
+		sta.push(s[i]);
+	}
+	return res;
+}
+
+int main() {
+	int N;
+	cin >> N;
+	vector<string> vec;
+	string s;
+	for (int i = 0; i < N; i++) {
+
+		cin >> s;
+		vec.push_back(s);
+	}
+
+	for (auto ss : vec) {
+		int res = count(ss);
+		cout << res << endl;
+	}
+	return 0;
+```
+
+### 3的分解
+
+n可以被分解为3个3的倍数
+
+9：3+3+3  1种  
+
+12： 6+3+3、3+6+3、3+3+6 3种
+
+15： 6种 
+
+18： 10种 
+
+21： 15种
+
+输出n能分解为几种，不能分解返回0
+
+```c++
+int count(string s) {
+	int res = 0;
+	stack<char> sta;
+	for (int i = 0; i < s.size(); i++) {
+		if (!sta.empty()) {
+			if ((s[i] == '}' && sta.top() == '{') || (s[i] == ']' && sta.top() == '[')) {
+				sta.pop();
+				continue;
+			}
+			else if ((s[i] == '}' && sta.top() == '[') || (s[i] == ']' && sta.top() == '{')) {
+				sta.pop();
+				res += 1;
+				continue;
+			}
+		}
+		sta.push(s[i]);
+	}
+	return res;
+}
+
+int main() {
+	int N;
+	cin >> N;
+	vector<string> vec;
+	string s;
+	for (int i = 0; i < N; i++) {
+		
+		cin >> s;
+		vec.push_back(s);
+	}
+
+	for (auto ss : vec) {
+		int res = count(ss);
+		cout << res << endl;
+	}
+	return 0;
+}
+```
+
 百度：
 
 ```
