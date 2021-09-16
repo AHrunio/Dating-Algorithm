@@ -8616,7 +8616,268 @@ int reverse(int x) {
     }
 ```
 
- 
+### 矩阵中的最长递增路径
+
+ [329. 矩阵中的最长递增路径](https://leetcode-cn.com/problems/longest-increasing-path-in-a-matrix/)
+
+朴素深度优先搜索的时间复杂度过高的原因是进行了大量的重复计算，同一个单元格会被访问多次，每次访问都要重新计算。由于同一个单元格对应的最长递增路径的长度是固定不变的，因此可以使用记忆化的方法进行优化。
+
+```c++
+int dirs[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    int rows, cols;
+
+    int longestIncreasingPath(vector< vector<int> > &matrix) {
+        if (matrix.size() == 0 || matrix[0].size() == 0) {
+            return 0;
+        }
+        rows = matrix.size();
+        cols = matrix[0].size();
+        auto visit = vector< vector<int> > (rows, vector <int> (cols));
+        int ans = 0;
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                ans = max(ans, dfs(matrix, i, j, visit));
+            }
+        }
+        return ans;
+    }
+
+    int dfs(vector< vector<int> > &matrix, int row, int col, vector< vector<int> > &visit) {
+        if (visit[row][col] != 0) {
+            return visit[row][col];
+        }
+        ++visit[row][col];
+        for (int i = 0; i < 4; ++i) {
+            int nrow = row + dirs[i][0], newcol = col + dirs[i][1];
+            if (nrow >= 0 && nrow < rows && newcol >= 0 && newcol < cols && matrix[nrow][newcol] > matrix[row][col]) {
+                visit[row][col] = max(visit[row][col], dfs(matrix, nrow, newcol, visit) + 1);
+            }
+        }
+        return visit[row][col];
+    }
+```
+
+### 另一棵树的子树
+
+[另一棵树的子树](https://leetcode-cn.com/problems/subtree-of-another-tree/)
+
+```c++
+bool check(TreeNode*root,TreeNode*subRoot) //判断是否是一个相同的树
+    {
+        //递归结束条件一：当其左右子树为空 代表已经匹配上
+        if(root ==nullptr&&subRoot == nullptr)return true;
+        //递归结束条件二：倘若有一个子树不为空 代表未匹配上
+        if(!root||!subRoot)return false;
+        //递归结束条件三 若节点值不同 代表未匹配上
+        if(root->val != subRoot->val) return false;  
+        //若为相同一个树 则两棵树的左右子树是相同的 同步移动两棵树的指针
+    return check(root->left,subRoot->left)&&check(root->right,subRoot->right);
+    }
+    bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+        //若subRoot为空树 怎么比较都是true
+        if(subRoot == nullptr)return true;
+        //若root为空树，怎么比较都是false
+        if(root == nullptr)return false;
+        //符合subRoot是root子树的三个条件：两棵树完全相同；SubRoot为root的左子树，SubRoot为root的右子树
+        return check(root,subRoot)||isSubtree(root->left,subRoot)||isSubtree(root->right,subRoot);
+    }
+```
+
+### 分割数组的最大值
+
+[410. 分割数组的最大值](https://leetcode-cn.com/problems/split-array-largest-sum/)
+
+解题思路：
+由题意可知：子数组的最大值是有范围的，即在区间 [max(nums) , sum(nums) ]  之中。
+令 l=max(nums)，h=sum(nums)，mid=(l+h)/2，计算数组和最大值不大于mid对应的子数组个数 cnt(这个是关键！)
+如果 cnt>m，说明划分的子数组多了，即我们找到的 mid 偏小，故 l=mid+1l=mid+1；
+否则，说明划分的子数组少了，即 mid 偏大(或者正好就是目标值)，故 h=midh=mid。
+
+```c++
+int splitArray(vector<int>& nums, int m) {
+        long l = nums[0], h = 0;//int类型在这里不合适，因为h可能会超过int类型能表示的最大值
+        for (auto i : nums)
+        {
+            h += i;
+            l = l > i ? l : i;
+        }
+        while (l<h)
+        {
+            long mid = (l + h) / 2;
+            long temp = 0;
+            int cnt = 1;//初始值必须为1
+            for(auto i:nums)
+            {
+                temp += i;
+                if(temp>mid)
+                {
+                    temp = i;
+                    ++cnt;
+                }
+            }
+            if(cnt>m)
+                l = mid + 1;
+            else
+                h = mid;
+        }
+        return l;
+    }
+```
+
+### 两个数组的交集
+
+[349. 两个数组的交集](https://leetcode-cn.com/problems/intersection-of-two-arrays/)
+
+```c++
+ vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
+        unordered_map<int,int> sett;
+        vector<int> res;
+        for(auto n1:nums1){
+            if(sett.count(n1)==0)
+                sett[n1]=1;
+        }
+        for(auto n2:nums2){
+            if(sett.count(n2)==1){
+                sett[n2]=2;
+            }
+        }
+        for(auto m:sett){
+            if(m.second==2){
+                res.push_back(m.first);
+            }
+        }
+        return res;
+    }
+```
+
+### 最长公共前缀
+
+[14. 最长公共前缀](https://leetcode-cn.com/problems/longest-common-prefix/)
+
+纵向扫描，从前往后遍历所有字符串的每一列，比较相同列上的字符是否相同，如果相同则继续对下一列进行比较，如果不相同则当前列不再属于公共前缀，当前列之前的部分为最长公共前缀
+
+```c++
+string longestCommonPrefix(vector<string>& strs) {
+        if (!strs.size()) {
+            return "";
+        }
+        int length = strs[0].size();
+        int count = strs.size();
+        for (int i = 0; i < length; ++i) {
+            char c = strs[0][i];
+            for (int j = 1; j < count; ++j) {
+                if (i == strs[j].size() || strs[j][i] != c) {
+                    return strs[0].substr(0, i);
+                }
+            }
+        }
+        return strs[0];
+    }
+```
+
+### 最长有效括号
+
+[最长有效括号](https://leetcode-cn.com/problems/longest-valid-parentheses/)
+
++ 对于遇到的每个 ‘(’ ，将它的下标放入栈中
++ 对于遇到的每个 ‘)’ ，先弹出栈顶元素表示匹配了当前右括号：
+  + 如果栈为空，说明当前的右括号为没有被匹配的右括号，我们将其下标放入栈中来更新我们之前提到的「最后一个没有被匹配的右括号的下标」
+  + 如果栈不为空，当前右括号的下标减去栈顶元素即为「以该右括号为结尾的最长有效括号的长度」
+
+一开始栈为空，第一个字符为左括号的时候我们会将其放入栈中，这样就不满足提及的「**最后一个没有被匹配的右括号的下标**」，为了保持统一，一开始的时候往栈中放入一个值为  −1 的元素
+
+```c++
+int longestValidParentheses(string s) {
+        int res = 0;
+        stack<int> stk;
+        stk.push(-1);
+        for (int i = 0; i < s.length(); i++) {
+            if (s[i] == '(') {
+                stk.push(i);
+            } else {
+                stk.pop();
+                if (stk.empty()) {
+                    stk.push(i);
+                } else {
+                    res = max(res, i - stk.top());
+                }
+            }
+        }
+        return res;
+    }
+```
+
+### 二叉树中的最大路径和
+
+[124. 二叉树中的最大路径和](https://leetcode-cn.com/problems/binary-tree-maximum-path-sum/)
+
+```c++
+
+
+public:
+	int maxSum = INT_MIN;
+    int maxget(TreeNode* node) {
+        if (node == nullptr) {
+            return 0;
+        }
+        
+        // 递归计算左右子节点的最大贡献值
+        // 只有在最大贡献值大于 0 时，才会选取对应子节点
+        int leftget = max(maxget(node->left), 0);
+        int rightget = max(maxget(node->right), 0);
+
+        // 节点的最大路径和取决于该节点的值与该节点的左右子节点的最大贡献值
+        int sum = node->val + leftget + rightget;
+
+        // 更新答案
+        maxSum = max(maxSum, sum);
+
+        // 返回节点的最大贡献值
+        return node->val + max(leftget, rightget);
+    }
+
+    int maxPathSum(TreeNode* root) {
+        maxget(root);
+        return maxSum;
+    }
+```
+
+### 最大正方形
+
+[221. 最大正方形](https://leetcode-cn.com/problems/maximal-square/)
+
+![image-20210916205651219](https://gitee.com/ahrunio/pic-go-image-hosting-service/raw/master/img/image-20210916205651219.png)
+
+`dp(i, j) `是以 `matrix(i - 1, j - 1)` 为 右下角 的正方形的最大边长。
+等同于：`dp(i + 1, j + 1) `是以 `matrix(i, j) `为右下角的正方形的最大边长
+
+```c++
+int maximalSquare(vector<vector<char>>& matrix) {
+        if (matrix.size() == 0 || matrix[0].size() == 0) {
+            return 0;
+        }
+        int maxSide = 0;
+        int rows = matrix.size(), columns = matrix[0].size();
+        vector<vector<int>> dp(rows, vector<int>(columns));
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                if (matrix[i][j] == '1') {
+                    if (i == 0 || j == 0) {
+                        dp[i][j] = 1;
+                    } else {
+                        dp[i][j] = min(min(dp[i - 1][j], dp[i][j - 1]), dp[i - 1][j - 1]) + 1;
+                    }
+                    maxSide = max(maxSide, dp[i][j]);
+                }
+            }
+        }
+        int maxSquare = maxSide * maxSide;
+        return maxSquare;
+
+    }
+```
+
+
 
 ### 讨厌的1
 
@@ -8711,99 +8972,6 @@ void maxCountGoods() {
     }
     cout << cnt << endl;
 }
-```
-
-### 另一棵树的子树
-
-[另一棵树的子树](https://leetcode-cn.com/problems/subtree-of-another-tree/)
-
-```c++
-bool check(TreeNode*root,TreeNode*subRoot) //判断是否是一个相同的树
-    {
-        //递归结束条件一：当其左右子树为空 代表已经匹配上
-        if(root ==nullptr&&subRoot == nullptr)return true;
-        //递归结束条件二：倘若有一个子树不为空 代表未匹配上
-        if(!root||!subRoot)return false;
-        //递归结束条件三 若节点值不同 代表未匹配上
-        if(root->val != subRoot->val) return false;  
-        //若为相同一个树 则两棵树的左右子树是相同的 同步移动两棵树的指针
-    return check(root->left,subRoot->left)&&check(root->right,subRoot->right);
-    }
-    bool isSubtree(TreeNode* root, TreeNode* subRoot) {
-        //若subRoot为空树 怎么比较都是true
-        if(subRoot == nullptr)return true;
-        //若root为空树，怎么比较都是false
-        if(root == nullptr)return false;
-        //符合subRoot是root子树的三个条件：两棵树完全相同；SubRoot为root的左子树，SubRoot为root的右子树
-        return check(root,subRoot)||isSubtree(root->left,subRoot)||isSubtree(root->right,subRoot);
-    }
-```
-
-### 分割数组的最大值
-
-[410. 分割数组的最大值](https://leetcode-cn.com/problems/split-array-largest-sum/)
-
-解题思路：
-由题意可知：子数组的最大值是有范围的，即在区间 [max(nums) , sum(nums) ]  之中。
-令 l=max(nums)，h=sum(nums)，mid=(l+h)/2，计算数组和最大值不大于mid对应的子数组个数 cnt(这个是关键！)
-如果 cnt>m，说明划分的子数组多了，即我们找到的 mid 偏小，故 l=mid+1l=mid+1；
-否则，说明划分的子数组少了，即 mid 偏大(或者正好就是目标值)，故 h=midh=mid。
-
-```c++
-int splitArray(vector<int>& nums, int m) {
-        long l = nums[0], h = 0;//int类型在这里不合适，因为h可能会超过int类型能表示的最大值
-        for (auto i : nums)
-        {
-            h += i;
-            l = l > i ? l : i;
-        }
-        while (l<h)
-        {
-            long mid = (l + h) / 2;
-            long temp = 0;
-            int cnt = 1;//初始值必须为1
-            for(auto i:nums)
-            {
-                temp += i;
-                if(temp>mid)
-                {
-                    temp = i;
-                    ++cnt;
-                }
-            }
-            if(cnt>m)
-                l = mid + 1;
-            else
-                h = mid;
-        }
-        return l;
-    }
-```
-
-### 两个数组的交集
-
-[349. 两个数组的交集](https://leetcode-cn.com/problems/intersection-of-two-arrays/)
-
-```c++
- vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
-        unordered_map<int,int> sett;
-        vector<int> res;
-        for(auto n1:nums1){
-            if(sett.count(n1)==0)
-                sett[n1]=1;
-        }
-        for(auto n2:nums2){
-            if(sett.count(n2)==1){
-                sett[n2]=2;
-            }
-        }
-        for(auto m:sett){
-            if(m.second==2){
-                res.push_back(m.first);
-            }
-        }
-        return res;
-    }
 ```
 
 ### 括号修改为合法
